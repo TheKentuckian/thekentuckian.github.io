@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plane Tracker</title>
+
+  <style>
+    
+  </style>
+
+  
+</head>
+<body>
+  <!DOCTYPE html>
+<html>
+<head>
+    <title>Plane Tracker</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #map {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #a7d1e3; /* Light blue background for water */
+        }
+
+        #airplane {
+            position: absolute;
+            width: 60px; /* Increased size slightly for better visibility */
+            height: 60px;
+            /* New high-fidelity yellow airplane SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23FFC700' stroke='black' stroke-width='3' d='M50 0 L55 35 L98 48 L98 52 L55 65 L55 85 L70 90 L70 95 L52 95 L50 100 L48 95 L30 95 L30 90 L45 85 L45 65 L2 52 L2 48 L45 35 Z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        #radius-ring {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border: 2px dashed rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-sizing: border-box;
+        }
+
+        .info-box {
+            position: absolute;
+            background-color: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            transform: translate(-50%, 50px); /* Position below the airplane's center */
+        }
+
+        .info-box-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .flag-emoji {
+            font-size: 24px;
+        }
+
+        .flight-details {
+           line-height: 1.4;
+           color: #333;
+        }
+
+        #path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map">
+    <canvas id="path"></canvas>
+    <div id="radius-ring"></div>
+    <div id="airplane"></div>
+    <div class="info-box">
+        <div class="info-box-line">
+            <span class="flag-emoji">🇺🇸</span>
+            <div class="flight-details">
+                <b>Boeing 747-8</b><br>
+                FL345<br>
+                JFK > LAX
+            </div>
+        </div>
+        <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: black; font-size: 14px; white-space: nowrap;">20 MILES</div>
+    </div>
+</div>
+
+<script>
+    const airplane = document.getElementById('airplane');
+    const radiusRing = document.getElementById('radius-ring');
+    const infoBox = document.querySelector('.info-box');
+    const pathCanvas = document.getElementById('path');
+    const pathCtx = pathCanvas.getContext('2d');
+
+    pathCanvas.width = window.innerWidth;
+    pathCanvas.height = window.innerHeight;
+
+    let time = 0;
+    const pathPoints = [];
+    let prevX = window.innerWidth / 2; // Initialize to starting position
+    let prevY = window.innerHeight / 2;
+
+    function animate() {
+        time += 0.01;
+
+        // Figure-eight path logic
+        const x = window.innerWidth / 2 + Math.sin(time) * (window.innerWidth / 4);
+        const y = window.innerHeight / 2 + Math.sin(time * 2) * (window.innerHeight / 4);
+
+        // Calculate angle for rotation. Add a small check to prevent division by zero
+        if (Math.abs(x - prevX) > 0.1 || Math.abs(y - prevY) > 0.1) {
+            const angleRad = Math.atan2(y - prevY, x - prevX);
+            const angleDeg = angleRad * (180 / Math.PI);
+            // Apply rotation with a 90-degree offset because the SVG points "up"
+            airplane.style.transform = `translate(-50%, -50%) rotate(${angleDeg + 90}deg)`;
+        }
+        
+        // Update positions of all elements
+        airplane.style.left = x + 'px';
+        airplane.style.top = y + 'px';
+        radiusRing.style.left = x + 'px';
+        radiusRing.style.top = y + 'px';
+        infoBox.style.left = x + 'px';
+        infoBox.style.top = y + 'px';
+
+        pathPoints.push({ x, y });
+        drawPath();
+
+        prevX = x;
+        prevY = y;
+
+        requestAnimationFrame(animate);
+    }
+
+    function drawPath() {
+        pathCtx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+        pathCtx.beginPath();
+        if (pathPoints.length > 0) {
+            pathCtx.moveTo(pathPoints[0].x, pathPoints[0].y);
+        }
+        for (let i = 1; i < pathPoints.length; i++) {
+            pathCtx.lineTo(pathPoints[i].x, pathPoints[i].y);
+        }
+        pathCtx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        pathCtx.lineWidth = 3;
+        pathCtx.stroke();
+    }
+    
+    // Start the animation
+    animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+        pathCanvas.width = window.innerWidth;
+        pathCanvas.height = window.innerHeight;
+        pathPoints.length = 0; // Clear the path on resize
+    });
+
+</script>
+
+</body>
+</html>
+
+  <script>
+    
+  </script>
+</body>
+</html>
